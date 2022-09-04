@@ -1,1 +1,3 @@
-Lectures on Java language
+Essay on Java language
+
+For beginner to learn Java
