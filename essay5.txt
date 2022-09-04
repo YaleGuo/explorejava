@@ -1,0 +1,40 @@
+Java Essay Serials 1 - Java Basics - 5, & and &&
+The operator && is conditional AND, and the operator & is boolean logical AND and/or Integer Bitwise operator(& has two functions).
+
+Firstly we take a look at the simplest situation.
+for boolean value expression, a && b, if a is true and b is true, the result will be true, otherwise the result will be false;
+for boolean value expression, a & b, if a is true and b is true, the result will be true, otherwise the result will be false;
+That means for this situation, & and && is functional equivalent.
+
+But the evaluation process is not the same. for &, two operands should be evaluated, and for &&, if the left operand is false, the right-hand operand expression is not evaluated(Please note that it's not a compiler  optimization, it's a JLS' rule, so you can rely on it).
+for example, 
+		Boolean boolA = false;
+		Boolean boolB = null;
+		System.out.println(boolA && boolB);
+with the above statements, the output is false. that's because boolA is false, so boolB is noe evaluated(otherwise it will be a NullPointerException here).
+let us check what will be happened with &:
+		Boolean boolA = false;
+		Boolean boolB = null;
+		System.out.println(boolA & boolB);
+the output is:
+	Exception in thread "main" java.lang.NullPointerException.
+that's because for & operator, Java will evaluate both expression even if the first expression is false. this process is different from what of &&.
+Programmers call && short-circuit operator.
+
+& is also the bitwsie AND operator. showed as below:
+		int ia = 135;
+		int ib = 178;
+		System.out.println(ia & ib);
+the output will be 130.
+Here is how it is evaluated:
+the binary representation of 135 is 10000111, and 10110010 for 178.
+   10000111
+   10110010
+AND----------
+   10000010
+
+the last issue is that how Java know & should be a bitwise operateor or a boolean logical operator?
+the answer is depends on the operands type. The bitwise and logical operators may be used to compare two operands of numeric
+type or two operands of type boolean. for numeric type, it will be considered as bitwise operator.
+Keep in mind that here the numeric type only for those types which can be converted to an integral number. you can not use & for floating numbers.
+

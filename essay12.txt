@@ -1,0 +1,56 @@
+Java Essay Serials 1 - Java Basics - 12, == and equals()
+In Java, the operator == is used to compare two variables to see if they are the same, while equals() is a customized method to see if the object content is the same.
+
+The == operator is implemented to compare the memory value of a variable, for example:
+
+Given two primitive type integers a and b, suppose that a is 3 and b is also 3, here shows the memory mapping:
+
+| Address | value |
+-------------------
+| 0xA0F0  | 3     |
+-------------------
+| 0xA0F4  | 3     |
+-------------------
+After loading and linking, Java stores the variable 'a' in the memory addressed 0xA0F0, and 'b' in 0xA0F4. The variable name is actually an alias of memory address.
+The statement a==b would compare the value stored in the two addresses, they are both 3, so the result would be true.
+
+Other than primitive variables, objects(reference variables) exist in Java, for example, given two String a and b, with the values "abc" and "abc", for the statment a==b, the following shows the memory mapping:
+| Address | value |
+-------------------
+| 0xA0E0  | 0xF320|
+-------------------
+| 0xA0E4  | 0xFA40|
+-------------------
+|... ...          |
+-------------------
+| 0xF320  | a     |
+-------------------
+| 0xF321  | b     |
+-------------------
+| 0xF322  | c     |
+-------------------
+|... ...          |
+-------------------
+| 0xFA40  | a     |
+-------------------
+| 0xFA41  | b     |
+-------------------
+| 0xFA42  | c     |
+-------------------
+The variable 'a' is stored in the address 0xA0E0, this time storing its address(0xF320), where the literal "abc" is stored. Similarly, The variable 'b' is stored in 0xA0E0, storing another address(0xFA40), where the literal "xyz" is stored. The variable names a and b are also the alias of memory address.
+for the statement a==b, it compares the value, which are 0xF320 and 0xFA40, so
+the result is false, though they both refer to "abc".
+
+In conclusion, the operation a==b returns true when the value is 3 and a==b return false when the value is "abc". Some believe that the operator == behaves differently with primitive variables and reference objects. This is not true，as seen from the example above, the behaviours is the same: the == operator will always compare the variable values. They only return different results due to the difference in the very concept of 'value' between the primitive and the reference type, with the premier being literal and the latter being an address.
+
+equals() is a method defined in Object class, implemented like this:
+----------------------------------------------
+    public boolean equals(Object obj) {
+        return (this == obj);
+    }
+----------------------------------------------
+equals() and == are the same by default! 
+
+Since the 'Object' class is the root of all classes in Java, all objects would inherit the equals() method. The default behaviour of equals() is to compare the objects' addresses, which normally returns false. That's why we must override the equals() method when we define a new class. Even in JDK, the class String overrides equals() by comparing the string's content, hence "abc".equals("abc"), would return true.
+
+The popular saying that equals() compares the objects' content is not accurate. It's actually a customized method, and the behaviour depends on the implementation. Usually we expect equals() to return true if two objects being compared have the same content.

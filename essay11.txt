@@ -1,0 +1,52 @@
+Java Essay Serials 1 - Java Basics - 11. Can a constructor be overridden?
+The answer is no.
+A constructor is defined only for building "this object". When creating a subclass object, the superclass object will be created first. The constructor of subclass would only initialize the subclass object itself, similarly the constructor of the superclasss only applies for the superclass object.The two constructors are seperate.
+
+for example:
+----------------------------------------------------------
+public class Parent {
+    public Parent() {
+    	System.out.println("parent constructor executed.");
+    }
+    public void sayHello() {
+        System.out.println("hello from Parent");
+    }
+}
+public class Child extends Parent {
+    public Child() {
+    	System.out.println("child constructor executed.");
+    }
+    public void sayHello() {
+        System.out.println("hello from Child.");
+    }
+}
+public class StartTest {
+    public static void main(String[] args) {
+	Child c = new Child();
+	c.sayHello();
+	((Parent)c).sayHello();
+    }
+}
+----------------------------------------------------------
+The above program outputs:
+parent constructor executed.
+child constructor executed.
+hello from Child.
+hello from Child.
+
+With this example, we can see that when initialising 'child', the parent object would be created first, hence the output: "parent constructor executed", followed by "child constructor executed". The compiler would automatically insert the superclass constructor at the first line in the subclass constructor (super()) in the case of the absence of the statement. 
+
+Let's modify the subclass constructor by adding the super() statement in the first line:
+    public Child() {
+    	super();
+    	System.out.println("child constructor executed.");
+    }
+
+The outputs from the two versions of the 'child' constructor will be the same. The compiler will not add the super() statement if it was manually written. It is also ruled that the super() statement must be the first statement of a constructor, if broken, the compiler complains:  "Constructor call must be the first statement in a constructor".
+
+In the case of a shared name between the Parent and Child constructors, (Suppose that one inserts the following code into the class 'Child' with the intention of overriding the Parent constructor):
+    public Parent() {
+    }
+The compiler would prompt an error: "Return type for the method is missing". Due to it regarding Parent() as a common method instead of a constructor.
+
+In comparison, for the method, sayHello(), the Child class would override the Parent. The subclass method will be always executed, even if you explicitly cast it to the superclass. That's why the statement ((Parent)c).sayHello() would still print "hello from Child".

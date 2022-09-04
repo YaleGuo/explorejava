@@ -1,0 +1,87 @@
+Java Essay Serials 1 - Java Basics - 28, How to get a class object? 
+Answer: 
+1,anObject.getClass
+2,AClass.class
+3,Class.forName();
+
+The entry point for almost all reflection operations is java.lang.Class. There are several ways to get a class object.
+
+Object.getClass()
+If an instance od an object is available, the class object can be got with object.getClass().
+For example:
+    public static void main(String[] args) {
+        Class<?> clz;
+	HashMap hm = new HashMap();
+	System.out.println(hm);
+	clz = hm.getClass();
+	System.out.println(clz);
+    }
+This program prints:
+{}
+class java.util.HashMap
+
+The method getClass() is a method applied for object, so any object can use this method to get the class object. Here shows how it apply for array and enum.
+Firstly we have look at array:
+        int[] intArr = new int[]{1,2,3,4,5};
+        clz = intArr.getClass();
+	System.out.println(clz);
+For the above code snippet, the program would print "class [I", in which the symbol "[I" represents integer array data type. Please note that the primitive type is different from the wrapper class. For example:
+        Integer[] intArr = new Integer[]{1,2,3,4,5};
+        clz = intArr.getClass();
+	System.out.println(clz);
+The program prints:
+	class [Ljava.lang.Integer;
+
+Then look at the situation of enum:
+enum E {red, green, blue};
+public class SimpleTest {
+    public static void main(String[] args) {
+        Class<?> clz;
+       	clz = E.blue.getClass();
+	System.out.println(clz);
+    }
+}
+The program prints:class E. 
+This program also proves that enum is actually a class in Java.
+
+And as getClass() requires an object to be invoked, so for primitive tpe, the method does not work. If we write the code:
+	int i = 10;
+	i.getClass();
+An compiler error would be prompted:Cannot invoke getClass() on the primitive type int.
+
+If the instance is not available, we can use .class syntax to get the class object.
+For example:
+    public static void main(String[] args) {
+        Class<?> clz;
+	clz = HashMap.class;
+	System.out.println(clz);
+    }
+The program prints:
+class java.util.HashMap
+
+Someone wonders here. HashMap is just a class name, how can Java get an instance from the class name? That's because when JVM encountering HashMap.class statement, JVM would load the class into memory and create an associative class object.
+
+The .class syntax can get class object for primitive type. For example:
+	clz = int.class;
+	System.out.println(clz);
+The program prints: int. The .class syntax returns the Class corresponding to the type int. Please note that it's different from java.lang.Integer.
+We use the program to illustrate:
+	clz = Integer.class;
+	System.out.println(clz);
+The program prints: class java.lang.Integer
+
+Java supplies .TYPE field to get the class of primitive type, for example:
+	clz = Integer.TYPE;
+	System.out.println(clz);
+The program prints: int.
+We can see that Integer.TYPE is identical to int.class.
+
+Class.forName("")
+If only the class name is known, the class object can be got with Class.forName("") statement.
+For example:
+clz = Class.forName("java.util.HashMap"); this is for HashMap.
+or
+clz = Class.forName("[I"); This is for int[]
+or
+clz = Class.forName("[[Ljava.lang.String"); This is for String[][]
+

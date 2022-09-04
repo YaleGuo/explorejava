@@ -1,0 +1,24 @@
+Java Essay Serials 1 - Java Basics - 25, Static variable vs Instance variable
+A static variable is belong to a class, while an instance variable is belong to an instance. Hence a static variable can be shared among all instances.
+
+For example, we define a static variable in AClass:
+class AClass {
+    public static int num = 10;
+}
+The static variable num can be accessed without an instance:
+class Test {
+    public void read() {
+        int n = AClass.num;
+    }
+}
+
+And we can also access the static variable in an instance, for example:
+	public void write() {
+		AClass a = new AClass();
+		a.num = 20;
+	}
+Here we create a new instance of AClass, then access the static variable via the instance.
+It works but not recommended. Actually the compiler would complain a warning "The static field AClass.num should be accessed in a static way".
+It's practically not good to access static variable via instance, Josh Bloch said that's a "bad decision".
+
+From Java 8 onwards, the static variables and constants are stored in the Heap, in the Class object associated with instances.

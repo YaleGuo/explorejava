@@ -1,0 +1,60 @@
+Java Essay Serials 1 - Java Basics - 4, The difference between int and Integer.
+int is primitive, and Integer is a wrapper class..
+In Java, each primitive type has a corresponding wrapper class, listed as below:
+boolean - Boolean
+char - Character
+byte - Byte
+short - Short
+int - Integer
+long - Long
+float - Float
+double - Double
+in which, Boolean and Character are directly inherit Object class, and the other 6 classes are subclasses of Number.
+As Java is an OOP language, with these wrapper classes, it will be convenient for some situations where an object required.
+for exmple, collections must contain objects, you can not define a list of int(s) like as List<int>, you must use List<Integer> instead.
+Another situation is empty parameter, say, for the method process(int i), the parameter "i" must have a normal value, you can not set it to empty. If we use process(Integer i), i could be null as it's now an object.
+Here introduce an issue, within a program, sometimes we use int, sometimes we use Integer, how do they work together with a mixed model?
+At the beginning, I mean, before Java 5, you have to manually convert the types between int and Integer(same for other wrapper classes):
+Integer i2 = Integer.valueOf(6);
+the above statement will convert a primitive value 6 to an Integer object i2 with the value 6.
+Then you can imagine, this conversion will make program cumbersome. It's lucky that with Java 5, auto-boxing and unboxing introduced.
+Now you just need to write code like this:
+Integer i2 = 6;
+Internally, Java will automatically use Integer.valueOf() to convert the value, just like before. this process is called boxing.
+unboxing is the reversal process of boxing, that is to say, to convert an Integer to an int, showed as below :
+int i = i2; //where i2 is an object
+this statement is equivalent to int i = i2.intValue();
+hence, we can write the following statements and run correctly:
+Integer i = 1000;
+int j = 1000;
+System.out.println(i==j);
+the above == operator will auto-unboxing Integer i to int value.
+
+But in Java, ther is a very tricky issue here, see the following code snippet:
+	Integer int1 = 128;
+	Integer int2 = 128;	
+	System.out.println(int1==int2);
+the output is false. It's reasonable, because int1 and int2 are both Integer objects, so the operator == will compare the references, which are apparently different for the 2 obejcts.
+Now, we change the above code snippet to the followings:
+	Integer int1 = 127;
+	Integer int2 = 127;	
+	System.out.println(int1==int2);
+Run it, you will find that the output is true!
+
+We have mentioned that for a number literal Java will interenally use autoboxing Integer i1 =Integer.valueOf(128). Java caches the instances for values smaller than 128. That means valueOf() method returns the same instance for values smaller than 128. that's why for 128, returns false, but for 127, returns true.
+
+Let us check the JDK source code:
+    /**
+     * Returns an Integer instance representing the specified int value.  
+     *
+     * This method will always cache values in the range -128 to 127,
+     */
+    public static Integer valueOf(int i) {
+        if (i >= IntegerCache.low && i <= IntegerCache.high)
+            return IntegerCache.cache[i + (-IntegerCache.low)];
+        return new Integer(i);
+    }
+With source code, there is no secret.
+From the source code, we know that values between -128 to 127 are always cached.
+
+The final conclusion is that NEVER rely on == ne identical, but always compare them with .equals().

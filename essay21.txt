@@ -1,0 +1,102 @@
+Java Essay Serials 1 - Java Basics - 21, Can an anonymous Inner Class extend another class? What about implementing an interface?
+
+Anonymous inner classes can extend a single class or implement a single interface, Not both.
+
+Anonymous classes are inner classes without names. But firstly, for this example，we'll explore a normal inner class ：
+public class OuterClass {
+    public void displayInner(){
+        InnerClass innerClass=new InnerClass();
+        innerClass.display();
+    }
+    private class InnerClass{
+        void display(){
+            System.out.println("InnerClass display...");
+        }
+    }
+    public static void main(String[] args) {
+        OuterClass outerClass = new OuterClass();
+        outerClass.displayInner();
+    }
+}
+
+The inner class InnerClass is defined within the body of OuterClass, it is a normal class only with its scope limited within the outer one. The outer class and the inner class are bi-directionally visible to each other.
+
+Now we'll have InnerClass inherit another class:
+
+public class OuterClass {
+    public void displayInner(){
+        InnerClass innerClass=new InnerClass();
+        innerClass.display();
+    }
+    private class InnerClass extends OneClass{
+        void display(){
+            System.out.println("InnerClass display...");
+        }
+    }
+}
+class OneClass {
+    void display(){
+    	System.out.println("OneClass display...");
+    }
+}
+
+The program runs properly, just like other normal classes.
+
+Now let us have a look at the situation of anonymous inner class.
+public class OuterClass {
+    public void displayInner(){
+    	OneClass innerClass = new OneClass() {
+    		@Override
+    		void display() {
+    			System.out.println("InnerClass display");
+    		}
+    		
+    	};
+        innerClass.display();
+    }
+}
+class OneClass {
+	void display(){
+    	System.out.println("OneClass display...");
+    }
+}
+
+With this program, we did not define a named class InnerClass like before, but rather made a new class without a name:
+   	OneClass innerClass = new OneClass() {
+    		@Override
+    		void display() {
+    			System.out.println("InnerClass display");
+    		}
+    		
+    	};
+
+In this situation, Java compiler would create a new subclass of OneClass, say a OuterClass$1.class file. If we use a decompiler tool to check the generated code, it would look like this:
+class OuterClass$1 extends OneClass{
+    void display()  {
+        System.out.println("InnerClass display");
+    }
+} 
+
+Because Java automatically make anonymous inner classes extend a class, so it's impossible for it to inherit another class.
+ 
+For interface, the same thing. For example:
+interface ClickListener {
+	void onClick();
+}
+public class Button {
+    public void click() {
+        new ClickListener() {
+	        public void onClick() {
+	                System.out.println("click button...");
+	        }
+	}.onClick();
+    }
+}
+With this program, we have defined an interface ClickListener, then called the interface. Java would create a new class with the name "Button$1" and make it implement the interface ClickListener:
+class Button$1 implements ClickListener {}
+
+Here, the anonymous class already implement an interface, so it cannot implement another interface. 
+
+This is the difference between anonymous classes and normal classes. For a normal class, it can extend a class and implement multiple interfaces. But for an anonymous class, it can extend one class or implement one interface, but not both.
+
+Java does not allow the explicit statement 'extends class' or 'implements interface', some programmers insist that anonymous inner class cannot extend another class or implement another interface. From the aspect of Java language and compiler, it's not correct, but from the aspect of coding, it's correct, at least to some extend.

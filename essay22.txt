@@ -1,0 +1,145 @@
+Java Essay Serials 1 - Java Basics - 22. Can an inner class access the members of its outer class?Is there any restriction?
+Yes, an inner class can access the members of its outer class, and vice versa. But there are restrictions for anonymous inner classes.
+
+Firstly let us have a look at the scene of accessing outer members from an inner class:
+public class OuterClass {
+    private String name="OurClass Default Name";;
+    private void display(){
+        System.out.println("OuterClass display..."+name);
+    }
+    class InnerClass{
+        public void displayOuter(){
+            System.out.println("InnerClass display outer..."+name);
+            display();
+        }        
+    }    
+    public static void main(String[] args) {
+        OuterClass outerClass = new OuterClass();
+        OuterClass.InnerClass innerClass = outerClass.new InnerClass();
+        innerClass.displayOuter();
+    }
+}
+Here we have an inner class, which prints a property 'name' and calls a method 'display()', which are defined in the outer class. The program outputs:
+
+InnerClass display outer...OurClass Default Name
+OuterClass display...OurClass Default Name
+
+It shows the inner class can access the members in outer class, even if they are private.
+
+What if we define the same members in inner classes? for example, we change the inner class to:
+
+    class InnerClass{
+	private String name = "inner class default name";;
+        public void displayOuter(){
+            System.out.println("InnerClass display outer..."+name);
+            display();
+        }        
+        void display(){
+        	System.out.println("InnerClass display..."+name);
+        }
+    }
+
+This program would print:
+
+InnerClass display outer...inner class default name
+InnerClass display...inner class default name
+
+We can see that the inner class would access the members of itself under this situation.
+
+To access the outer class' members with the same name, we have this program:
+
+        public void displayOuter(){
+            System.out.println("InnerClass display outer..."+name);
+            System.out.println("InnerClass display outer..."+OuterClass.this.name);
+            display();
+            OuterClass.this.display();
+        }        
+
+This time the outputs would be:
+
+InnerClass display outer...inner class default name
+InnerClass display outer...OurClass Default Name
+InnerClass display...inner class default name
+OuterClass display...OurClass Default Name
+
+The special statements OuterClass.this.name and OuterClass.this.display() make the inner class access the members defined in the outer class.
+
+Then we have a look at the other direction: to access the inner members from outer classes.
+
+public class OuterClass {
+    public void displayInner(){
+        InnerClass innerClass=new InnerClass();
+        System.out.println("OuterClass display inner..."+innerClass.name);
+        innerClass.display();
+    }
+    class InnerClass{
+	private String name = "inner class default name";;
+        void display(){
+        	System.out.println("InnerClass display..."+name);
+        }
+    }   
+    public static void main(String[] args) {
+        OuterClass outerClass = new OuterClass();
+        outerClass.displayInner();
+    }
+}
+
+This program prints:
+
+OuterClass display inner...inner class default name
+InnerClass display...inner class default name
+
+It shows that an outer class can access the members of the inner class, even if they are private.
+
+Now we go further for the restriction. 
+
+We change the method displayInner() in OuterClass:
+    public void displayInner(){
+    	OneClass innerClass = new OneClass() {
+    		public String name = "inner name";
+    		@Override
+    		void display() {
+    			System.out.println("InnerClass display : "+OuterClass.this.name);
+    		}
+    		
+    	};
+        //System.out.println("OuterClass display inner..."+innerClass.name);
+        innerClass.display();
+    }
+
+Now we'll use an anonymous class, and try to acccess the member defined in the outer class, and try to access the inner method from outer class. This program outputs:
+
+InnerClass display : OutClass Default Name
+
+But from the outer class, if we try to access the inner field name: innerClass.name, a compilation error would be prompted: The field OneClass.name is not visible.
+
+It shows that for an anonymous class, the outer class cannot access the inner members. When calling innerClass.display(), it can access the method defined in inner class due to the override mechanism.
+
+Finally, we try to change the above method to:
+    public void displayInner(){
+    	String sTest = "";
+    	OneClass innerClass = new OneClass() {
+    		public String name = "inner name";
+    		@Override
+    		void display() {
+    			//System.out.println("InnerClass display");
+    			System.out.println("InnerClass display : "+OuterClass.this.name);
+    			System.out.println(sTest);
+    			sTest="";
+    		}
+    		
+    	};
+        //System.out.println("OuterClass display inner..."+innerClass.name);
+        innerClass.display();
+    }
+With the program, we add a local variable sTest to the method displayInner, then try to print it and assign a new value to it. The compiler would complain an error for the assignment statement sTest=""; 
+
+"Local variable sTest defined in an enclosing scope must be final or effectively final"
+
+But if we set the local variable to final, another error would occur:
+
+"The final local variable sTest cannot be assigned, since it is defined in an enclosing type"
+
+It means we can read the variable defined in an enclosing type, but can not write it.
+
+This restriction is actually the topic of Java Closure. If you are familiar with javascript or python, you may know the concept Closure. For the anonymous OneClass, the variable sTest is defined outside (within the method displayInner), so it's a typical closure scenario. But Java does not fully support closure, it would just use a capture-by-value strategy to copy the value of sTest to the anonymous class, so sTest can be read from the inner class. But we can not assign the variable with a new value, because it can not be returned back to the variable sTest outside, that's why Java bans the operation.

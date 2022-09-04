@@ -1,0 +1,37 @@
+Java Essay Serials 1 - Java Basics - 29. How to create object using reflection？
+A new object instance can be created with reflection. There are two reflective methods for creating instances of classes: constructor.newInstance() and Class.newInstance(). 
+
+for example, we use Class.newInstance() to create a new instance:
+    public static void main(String[] args) {
+        Class<?> clz;
+	try {
+		clz = Class.forName("java.util.HashMap");
+		HashMap hm = (HashMap)(clz.newInstance());
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
+    }
+
+Then let us take a look at creating instance with parameterized constructor:
+public class ConstructorDemo {
+	private ConstructorDemo(HashMap hm) {
+	}
+	public static void main(String[] args) {
+		Map<String, String> maps = new HashMap<String, String>();
+	    
+		maps.put("A", "Alice");
+		maps.put("B", "Bob");
+	    
+	        Constructor ctor;
+		try {
+			ctor = ConstructorDemo.class.getDeclaredConstructor(HashMap.class);
+		        ConstructorDemo cd = (ConstructorDemo)ctor.newInstance(maps);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}		    
+	}
+}
+
+Using constructor to create new instance is preferred because:
+Class.newInstance() can only invoke the zero-argument constructor, while Constructor.newInstance() may invoke any constructor, regardless of the number of parameters.
+Class.newInstance() requires that the constructor be visible; Constructor.newInstance() may invoke private constructors under certain circumstances.

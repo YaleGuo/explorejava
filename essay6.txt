@@ -1,0 +1,58 @@
+Java Essay Serials 1 - Java Basics - 6, How a Java program jump out a nested loop?
+Within a loop statement, such as for,while and do-while statement, a break statement will terminate the loop execution and jump to the next statement following the loop.
+for exmaple:
+    int m=0;
+    while(m<5){  
+        if(m==2){  
+            break;  
+        }  
+        System.out.println(m);
+        m++;  
+    }  
+    System.out.println("terminate while statement.");  
+the above code snippet will output:
+0
+1
+terminate while statement.
+
+with nested loop statements, the break statement only jump out the inner loop.
+for example:
+		for (int n=0;n<3;n++) {
+		    int m=0;
+		    while(m<5){  
+		        if(m==2) break; 
+		        System.out.println(n+"-"+m);
+		        m++;
+		    }  
+		    System.out.println("terminate while statement.");  
+		}
+the above code snippet will output the following:
+0-0
+0-1
+terminate while statement.
+1-0
+1-1
+terminate while statement.
+2-0
+2-1
+terminate while statement.
+It apparently shows that the break statement only jump out the inner while loop.
+
+To jump out a nested loop, you can use break with a label, for example:
+		Label1:
+		for (int n=0;n<3;n++) {
+		    int m=0;
+		    while(m<5){  
+		        if(m==2) break Label1;  
+		        System.out.println(n+"-"+m);
+		        m++;
+		    }  
+		    System.out.println("terminate while statement.");  
+		}
+		
+		System.out.println("terminate for loop.");
+The running result will be:
+0-0
+0-1
+terminate for loop.
+

@@ -1,0 +1,132 @@
+Java Essay Serials 1 - Java Basics - 27, try-with-resources
+
+This is a more convenient approach to dispose resources after catching exceptions.
+
+The common structure for exception handling is:
+try {
+    ...
+}
+catch (exception e) {
+    ...
+}
+finally {
+    ...
+}
+The typical scenario is that the program open resources such as connections or files within the try block, and close these resources within the finally block. These code within the finally block are conventional, but if they are missed, that would bring disastrous result.
+    public static void main(String[] args) {
+        BufferedInputStream is = null;
+        try {
+            is = new BufferedInputStream(new FileInputStream(new File("f:\\data.txt")));
+            int c;
+            while ((c = is.read()) != -1) {
+                System.out.print(c);
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        finally {
+            if (is != null) {
+                try {
+                    is.close();
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+Java hence supplies a brirf approach to auto close these resources, that is try-with-resources. The common structure is:
+try (resource ) {
+   ...
+}
+catch() {
+   ...
+}
+
+For above example, we can modify it to:
+    public static void main(String[] args) {
+        try (BufferedInputStream is = new BufferedInputStream(new FileInputStream(new File("f:\\data.txt")))) { 
+            int c;
+            while ((c = is.read()) != -1) {
+                System.out.print(c);
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+Here is how Oracle descibes try-with-resources statement:
+The try-with-resources statement is a try statement that declares one or more resources. A resource is an object that must be closed after the program is finished with it. The try-with-resources statement ensures that each resource is closed at the end of the statement. 
+Any object that implements java.lang.AutoCloseable, which includes all objects which implement java.io.Closeable, can be used as a resource.
+
+Here we can make our own auto closeable class.
+class MyResource implements AutoCloseable {
+    public void open() {
+        System.out.println("Open my resource");
+    }
+    public void close() throws Exception {
+        System.out.println("my resource closed");
+    }
+}
+
+public class TryWithResource {
+    public static void main(String[] args) {
+    	try (MyResource mr = new MyResource()) {
+    		mr.open();
+    	} catch (Exception e) {
+		e.printStackTrace();
+	}
+    }
+}
+
+Run the program, it outputs:
+Open my resource
+my resource closed
+
+It automatically invoke the method close().
+How does Java do this. Let us decompiler the class:
+  public static void main(String[] args)  {
+      try {
+          MyResource mr;
+          Throwable localObject3;
+      	  try {
+        	  mr = new MyResource();
+      	  }
+	  catch (Throwable var12) {
+		  localObject3 = var12;
+		  throw var12;
+	  } 
+	  finally {
+		  if (mr != null) {
+			if (localObject3 != null) {
+		  	try {
+			    mr.close();
+			}
+			catch (Throwable localThrowable) {
+			    localObject3.addSuppressed(localThrowable);  
+			}
+			else {
+			    mr.close();
+			}
+		  }
+	  }
+      } catch (Exception e) {
+          e.printStackTrace();
+      }
+  }
+ 
+We can see that the generated class is the same as previous, no try-with-resource. The compiler automatically add the finally block to the program. It's actually a syntactic sugar.
+Note that with the generated code, the compiler uses the method addSuppressed() to throw a combined exception to the upper program, hence avoid the previous exception being suppressed.
+
+Finally, because the implementation approach of close behaviour is different from resources, when using try-with-resources statement, we should make it clear that all resources must be recoginzed, for example, the following code:
+        try (BufferedInputStream is = new BufferedInputStream(new FileInputStream(new File("f:\\data.txt")))) { 
+        }
+We create 2 streams with one statement, thus the compiler can only recognize the "BufferedInputStream". Under this situation, it may result in the resource failed to be closed. A better way is to declare the 2 resources separately, like this:
+        try (   FileInputStream fis = new FileInputStream(new File("f:\\data.txt"));
+		BufferedInputStream is = new BufferedInputStream(fis)) { 
+        }
+ 

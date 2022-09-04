@@ -1,0 +1,27 @@
+Java Essay Serials 1 - Java Basics - 15, String s=new String("xyz"); how many strings are created internally?
+
+The answer is 1 or 2. depends on the situation.
+
+To understand this problem better, we firstly have to get to know the memory structure in JVM. Logically, there is the PC register, the metaspace area, the heap area, the stack area and the native method stack area. In the heap area, JVM allocates a special section to store constants, such as constant strings and constant integers. This section is called the 'constant pool'.
+
+For the string "xyz", JVM would firstly look it up in the constant pool. If it does not exist there, JVM would create the string "xyz" and put it in constant pool. Otherwise, JVM would do nothing on "xyz", since it exists in the pool.
+However, for the statement : new String(), it would force JVM to create a new string in the heap area with the value "xyz".
+
+Now we have two strings here, one is a string instance in the heap area, and the other is the existing constant string in the pool.
+
+If the problem is regarding the memory allocation, we have to count the variable s, which is a reference pointing towards a string instance.
+
+With the knowledge of the memory structure, we can understand the result of the following code:
+------------------------------------
+String s1 = "hello";
+String s2 = "hello";
+String s3 = new String("hello");
+System.out.println(s1==s2);
+System.out.println(s2==s3);
+------------------------------------
+the code outputs:
+true
+false
+
+Both s1 and s2 refer to the same string in constant pool, hence the expression s1==s2 returns true.
+But s3 refers to a new string instance in the heap, which makes the expression s2==s3 return false.

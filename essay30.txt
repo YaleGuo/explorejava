@@ -1,0 +1,51 @@
+Java Essay Serials 1 - Java Basics - 30. getDeclaredMethods() and getMethods()
+
+getDeclaredMethods() returns an array of Method objects reflecting all the methods declared by the class or interface represented by this Class object, which are the methods that are private, public, protected or default, but not the inherited methods.
+
+public class UnderGraduate extends Student{
+	String major = "";
+	public UnderGraduate() {
+		System.out.println("UnderGraduate constructor()");
+	}
+	private boolean doubleMajor() {
+		return false;
+	}
+	@Override
+	public boolean isPass() {
+		return false;
+	}
+	public static void main(String[] args) {
+	}
+}
+public class StudentTest {
+    public static void main(String[] args) {
+	Student s = new UnderGraduate();
+	Class<?> clz = s.getClass();
+	System.out.println("Methods : "
+                + Arrays.toString(clz.getDeclaredMethods()));
+    }
+}
+The program prints:
+Methods : [public static void com.test.UnderGraduate.main(java.lang.String[]), public boolean com.test.UnderGraduate.isPass(), private boolean com.test.UnderGraduate.doubleMajor()]
+
+If this Class object represents an array type, a primitive type, or void, then the returned array has length 0.
+
+getMethods() returns an array containing Method objects reflecting all the public member methods of the class or interface represented by this Class object, including those declared by the class or interface and those inherited from superclasses and superinterfaces.
+public class StudentTest {
+    public static void main(String[] args) {
+	Student s = new UnderGraduate();
+	Class<?> clz = s.getClass();
+	System.out.println("Methods : "
+                + Arrays.toString(clz.getMethods()));
+    }
+}
+The program prints:
+Methods : [public static void com.test.UnderGraduate.main(java.lang.String[]), public boolean com.test.UnderGraduate.isPass(), public double com.demo.Student.calculate(int), public double com.demo.Student.calculate(), public final void java.lang.Object.wait() throws java.lang.InterruptedException, public final void java.lang.Object.wait(long,int) throws java.lang.InterruptedException, public final native void java.lang.Object.wait(long) throws java.lang.InterruptedException, public boolean java.lang.Object.equals(java.lang.Object), public java.lang.String java.lang.Object.toString(), public native int java.lang.Object.hashCode(), public final native java.lang.Class java.lang.Object.getClass(), public final native void java.lang.Object.notify(), public final native void java.lang.Object.notifyAll()]
+
+Please note that the overrided method in the parent class has not been printed, as it's overrided by the subclass.
+
+If this Class object represents an array type, then the returned array has a Method object for each of the public methods inherited by the array type from Object. It does not contain a Method object for clone().
+
+If this Class object represents an interface then the returned array does not contain any implicitly declared methods from Object. 
+
+If this Class object represents a primitive type or void, then the returned array has length 0.

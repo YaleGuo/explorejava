@@ -1,0 +1,36 @@
+Java Essay Serials 1 - Java Basics - 19, Can an interface extends another interface? Can an abstract class implements an interface? Can an abstract class extends a concrete class?
+Yes, in Java, an interface can extend another interface; an abstract class can implements an interface; and an abstract class can extend a concrete class.
+
+For example:
+interface Worker {
+	void doSomething();
+}
+interface ConstructionWorker extends Worker {
+	void doAnotherthing();
+}
+The interface ConstructionWorker extends the interface Worker.
+
+Another example would be:
+abstract class Test1 implements ConstructionWorker{
+	public void doSomething() {
+	}
+	abstract void doAdditional();
+}
+The abstract class Test implements the interface ConstructionWorker, adds another abstract method doAdditional(), and overrides the method doSomething() defined in the interface Worker.
+
+Note that, here, the method doSomething() must be public. Because we cannot reduce the visibility of the inherited method from Worker which all methods are public by default.
+
+Finally, let's have a look at an abstract class which extends a concrete class:
+class RoadWorker implements Worker {
+	public void doSomething() {
+		System.out.println("do something.");
+		return;
+	}
+}
+abstract class Test2 extends RoadWorker{
+	abstract void doAdditional();
+}
+
+The programs all run smoothly, proving the point: an interface can extend another interface; an abstract class can implements an interface; and an abstract class can extend a concrete class.
+
+

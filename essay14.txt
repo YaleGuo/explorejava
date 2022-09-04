@@ -1,0 +1,29 @@
+Java Essay Serials 1 - Java Basics - 14, Can I inherit String?
+
+No, the class String is final, hence it can not be overridden.
+
+This is the declaration of the class String:
+public final class String
+    implements java.io.Serializable, Comparable<String>, CharSequence {
+}
+
+With Java language specification, the String class is immutable, which means it cannot be changed after it is created. This allows them to be shared within the scope of whole JVM, in other words, two string variables would refer to the same string instance, resulting in a better performance.
+
+If String class is not final, the subclasses would have the ability to give a different implementation. For example, the String is used as arguments for class loading, if mutable, it could result in the wrong class being loaded, because it can be easily changed. This would cause severe security issue. The same thing would be happened with network programming, as the parameters of the sockets are normally string.
+
+But we know, the keyword 'final' only prevent the class from being overridden, it can not prevent the content of the string from being modified. for example:
+final char[] chrs = {'a','b','c'};
+Because the array chrs is declared as final, so it cannot be changed with:
+chars=new char[]{'a','b','d'};
+With this statement, the compiler would prompt an error:
+The final local variable chrs cannot be assigned. 
+
+But we can change the array's content with the following statement:
+chrs[2]='d';
+
+To protect the content within a string object, Java declare the array as private final.
+In Java 8:
+    private final char[] value;
+In Java 11:
+    private final byte[] value;
+

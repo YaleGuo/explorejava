@@ -1,0 +1,30 @@
+Java Essay Serials 1 - Java Basics - 7, what is the exact result of Math.round(11.5)? Math.round(-11.5)? and Math.round(-11.5001)?
+The result will be 12, -11, -12.
+Java supplies 3 similar methods: ceil(),floor() and round().
+To better understand round(), we should have a look at the methods ceil() and floor().
+the methods signatures are the following:
+public static double floor(double a)
+public static double ceil(double a)
+public static long round(double a)
+
+According to the JDK document, the method floor() returns the largest (closest to positive infinity) double value that is less than or equal to the argument and is equal to a mathematical integer. 
+with this definition, to apply the floor() method to 11.5,-11.5 and -11.5001,the results will be :11.0,-12.0 and -12.0.
+But there are special cases:if the argument is NaN or an infinity or positive zero or negative zero, then the result is the same as the argument.
+
+And the method ceil() returns the smallest (closest to negative infinity) double value that is greater than or equal to theargument and is equal to a mathematical integer. So with this definition, to apply the ceil() method to 11.5,-11.5 and -11.5001,the results will be :12.0,-11.0 and -11.0.
+Special cases: If the argument is NaN or an infinity orpositive zero or negative zero, then the result is the same asthe argument. 
+If the argument value is less than zero but greater than -1.0, then the result is negative zero.
+
+Note that the value of Math.ceil(x) is exactly the value of -Math.floor(-x).
+
+Now let's have a look at method round(), it will return the closest int to the argument. But this is not very clear, some still confused with it.
+for example, for the case Math.round(-11.5), why the closest number is -11 not -12 instead? 
+the JDK document has a further explanation :with ties rounding to positive infinity.
+with this explanation, we will choose -11 as the closest number.
+the result is equal to the value of the expression:        
+  (int)math.floor(a  +  0.5)  
+
+Special cases for round(): 
+If the argument is NaN, the result is 0. 
+If the argument is negative infinity or any value less than or equal to the value of Long.MIN_VALUE, the result isequal to the value of Long.MIN_VALUE. 
+If the argument is positive infinity or any value greater than or equal to the value of Long.MAX_VALUE, the result isequal to the value of Long.MAX_VALUE.

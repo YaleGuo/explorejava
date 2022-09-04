@@ -1,0 +1,94 @@
+Java Essay Serials 1 - Java Basics - 32, serialization
+Java serialization converts a Java object to a sequence of bytes, deserialization
+does the opposite. Typically it's bidirectional conversion from object to file or network stream. This mechanism is to persist object.
+The interface java.io.Serializable is used for serialization. All classes wants to properly serialized and deserialized must implements this interface.
+That Serializable is a marker interface,it means that it contains no methods.Implementing Serializable just tells Java that this class is intended for object serialization.
+
+Here is an example:
+public class Student implements Serializable {
+    private static final long serialVersionUID = 100L;
+    public String name = null;
+    public int    score  =   0;
+}
+By convention,a class intended for serialization should also contain a private static final long variable named serialVersionUID. It's for version control purpose.
+
+Now we can write a test program to make serialization and deserialization.
+public static void main(String [] args) {
+      Student s = new Student();
+      s.name = "Alice";
+      s.score = 87;
+      
+      try {
+         FileOutputStream fos = new FileOutputStream("/data.ser");
+         ObjectOutputStream oos = new ObjectOutputStream(fos);
+         oos.writeObject(s);
+         oos.close();
+         fos.close();
+      } catch (IOException i) {
+      }
+
+      s = null;
+      try {
+         FileInputStream fis = new FileInputStream("/data.ser");
+         ObjectInputStream ois = new ObjectInputStream(fis);
+         s = (Student) ois.readObject();
+         ois.close();
+         fis.close();
+      } catch (IOException i) {
+      } catch (ClassNotFoundException c) {
+      }
+      System.out.println(s.name);
+      System.out.println(s.score);
+}
+The program prints: 
+Alice
+87
+
+If there are some fields we do not want to store in the external byre stream, we can set the fields to transient. for example:
+public class Student implements Serializable {
+    private static final long serialVersionUID = 100L;
+    public String name = null;
+    public transient int score = 0;
+}
+Run the above test program again, this time the program prints:
+Alice
+0
+The field score's value(87) is not recovered, as it has not serialized to the external file.
+
+We can see that in fact we do not write any code to serialize Student class, just implement the Serializable and add the field serialVersionUID. The serialization is automatic. How Java work properly with it?
+In Java, there are "serializable object" and "serializer". The serialization work is actually executed by the serializer. For the above example, the serializer is the class ObjectOutputStream. 
+For serializer, such as ObjectOutputStream, it contains a writeObject() method to serialize an object. Similarly, the class ObjectInputStream contains a readObject() to deserialize an object.
+The writeObject method is responsible for writing the state of the object for its particular class so that the corresponding readObject method can restore it. 
+
+But if the serializable class require special handling during the serialization and deserialization process, it must implement writeObject() and readObject().
+For example, for the above Student class, we set the field score to transient, this would make score not be stored in the external file. Now we change the requirement to store score in external file with encrypted code. To accommodate this new requirement, we need to implement writeObject() method to manually store the field score, below is the code:
+public class Student implements Serializable {
+    private static final long serialVersionUID = 100L;
+    public String name = null;
+    public transient int score  =   0;
+    
+    private int encryptScore(int score) {
+    	return score;
+    }
+    private int decryptScore(int score) {
+    	return score;
+    }
+    private void writeObject(ObjectOutputStream oos) throws IOException{
+	oos.defaultWriteObject();
+	oos.writeInt(encryptScore(score));
+    }
+    private void readObject(ObjectInputStream ios) throws IOException, ClassNotFoundException{
+	ios.defaultReadObject();
+	score = decryptScore(ios.readInt());
+    }
+}
+By default, the field score is not stored as it is transient. We implement writeObject() method, first we call oos.defaultWriteObject(), which is the default mechanism for saving the Object's fields used in Java ObjetOutputStream. Then we manually store score by the statement oos.writeInt(encryptScore(score)). 
+Similarly we implemented readObject().
+
+Now, run the test program again, it prints:
+Alice
+87
+We can see that we successfully store a transient field to the external file and read it to the object. 
+In Java, the class ArrayList also uses this approach to store data.
+
+Today many Java projects serialize Java objects using different mechanisms than the Java serialization mechanism. For instance, Using JSON to serialze and deserialize, The advantage is it can also be read by non-Java applications. 

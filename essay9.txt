@@ -1,0 +1,26 @@
+Java Essay Serials 1 - Java Basics - 9. The most efficient way to calculte 2*8.
+Answer : 2<<3
+<< is bitwise operator. it will left shift 1 bit. here is how it works:
+the original value 2, whose binary representation is 00000010, the operation <<3 means to left shift for 3 times, then the result would be 00010000(16).
+Basically, the bitwise left shift is equilavent to multiplying by 2.
+
+Now we try more cases:
+2<<29, the result is 1073741824
+2<<30, the result is -2147483648
+2<<31, the result is 0
+2<<32, the result is 2
+To interpret the above "abnormal" result, we have to know,in Java, << applies for int. So each operand has 32 bits, we represent the value 2 as
+00000000 00000000 00000000 00000010
+for this value, <<29(left shift 29 times) will get the following binary value:
+01000000 00000000 00000000 00000000, this is the binary representation of value 1073741824.
+And for <<30, it will get:
+10000000 00000000 00000000 00000000
+
+An integer value is a signed value, internally represented with complement system,the highest bit defines the integer's parity, with 0 being positve and 1 being negative.
+Thus, the binary value 10000000 00000000 00000000 00000000 is a negative number, the inverse value is 01111111 11111111 11111111 11111111, plus 1, the complement original value is  10000000 00000000 00000000 00000000, that is 2^31, or 2147483648. So the result is -2147483648.
+
+Please note that the number -2147483648 and 2147483648 are the same with binary representation. Do not worry about that, actually a 32 bits integer can represent 4G (2^32 (4294967296)) numbers, you can look the number as a position index, say from 0 to 4294967295, or from -2147483648 to 2147483647, the former is unsigned value, and the latter of which is signed value. In algebra term,it's a ring, so at the last position 2147483647, adding 1 would bring the integer back to -2147483648.
+
+the other examples would easily become apparent with understanding of the complement system.
+
+The left shift can be easily and directly implemented by circuit, so it's theoreotically the fastest way to implement muliply. But the real running result depends on the optimization of the compiler. 

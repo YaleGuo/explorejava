@@ -1,0 +1,95 @@
+Java Essay Serials 1 - Java Basics - 13, Is it required to override hashCode() when overriding equals()?
+
+Yes, Java specification has this requirement.
+
+The method hashCode() returns a hash code value for the object. According to JDK rules, the general contract of hashCode() is:
+* If two objects are equal according to the equals(Object) method, then calling the hashCode() method on each of the two objects must produce the same integer result.
+* It is not required that if two objects are unequal according to the equals(java.lang.Object) method, then calling the hashCode() method on each of the two objects must produce distinct integer results.
+
+This method is supported for the benefit of collections, such as HashMap and HashSet.
+
+For example, we define an Employee class:
+
+public class Employee{
+	int id = 0;
+	String name = "";
+	public Employee(int id, String name) {
+		this.id = id;
+		this.name = name;
+	}
+	public String toString() {
+		return id + ":" + name;
+	}
+}
+
+For a start, we won't override equals() and hashCode(). They will be inherited from the root class: Object.
+
+Then, we use a HashSet to test the Employee class:
+
+public class EmpRoster {
+	public static void main(String[] args) {
+		Set<Employee> s1 = new HashSet<>();
+		s1.add(new Employee(1,"a"));
+		s1.add(new Employee(2,"b"));
+		s1.add(new Employee(3,"c"));
+		s1.add(new Employee(1,"a"));
+
+		System.out.print(s1);
+	}
+}
+
+Note that with the example above, the 1st employee and the 4th added to the set are the same person:(1,"a"). Because a set can not contain duplicate elements, we expect the program to only print 3 persons. But the program prints:
+
+[3:c, 1:a, 2:b, 1:a]
+
+Duplicated elements in the set!
+
+This is due to the absence of equals() and hashCode() in the Employee class. When defining this class, we did not override the two methods, so Java would invoke the parent class' methods by default. Hence equals() would return false, resulting in duplicated elements in the Set.
+
+Now we modify the Employee class by adding the equals() method:
+public class Employee{
+    int id = 0;
+    String name = "";
+    public Employee(int id, String name) {
+	this.id = id;
+	this.name = name;
+    }
+    public boolean equals (Object obj){
+        if(this==obj){
+            return true;
+        }
+        if(!(obj instanceof Employee)){
+            return false;
+        } 
+        Employee s=(Employee) obj;
+        if(this.id==s.id&&this.name.equals(s.name)) {
+            return true;
+        }
+        return false;
+    }
+    public String toString() {
+	return id + ":" + name;
+    }
+}
+With the customized equals() method, we assert that it would return true if two employee objects have the same id and name. This time we expect a proper result.
+
+But again:
+[3:c, 1:a, 2:b, 1:a]
+Nothing changed. We still have duplicated elements.
+
+What might be the cause of this "abnormal" result?
+
+It's because we have not complied with the convention when customzing equals() method: we have not customized the method hashCode().
+
+With collections, Java would check if the hashCode is different first, if so, immediately returning false. For this situation, Java will not execute the customized equals() method. In other words, the method equals() would be executed if and only if the hashCode is the same.
+
+For the program to run properly, the hashCode() must be overriden:
+    public int hashCode(){
+        return this.name.hashCode();
+    }
+
+Here, we used the name's hash code as the object's hash code. For the 1st object and the 4th object, the names are both 'a', which means that their hash codes would be the same. Then the hashset calls for the equals() method, this time returning true. Finally, the program detected the duplicated elements:
+
+[1:a, 2:b, 3:c]
+
+In conclusion, this requirement is imposed by the specification, not by the technical mechanism. But we all should comply with the convention.

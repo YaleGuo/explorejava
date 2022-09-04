@@ -1,0 +1,36 @@
+Java Essay Serials 1 - Java Basics - 20, Can one ".java" source file contain multiple classes?
+Yes, one '.java' source file can contain multiple classes, but only one is public, and the one must has the same name with the file name.
+
+for example:
+Test1.java
+public class Test1{
+	void doTest() {
+	};
+}
+class Utility {
+	String name = "";
+	Utility() {
+	}
+}
+Within the Test1.java file, there are 2 classes Test1 and Utility.
+If we set Utility to public, the compiler would complain:
+The public type Utility must be defined in its own file.
+
+This rule applies for interface as well.
+for example:
+interface Worker {
+	void doSomething(Utility util);
+}
+public class Test1 implements Worker{
+	public void doSomething(Utility util) {
+	}
+	void doTest() {
+	};
+}
+class Utility {
+	String name = "";
+	Utility() {
+	}
+}
+If we set the interface Worker to public, the same error would be prompted.
+

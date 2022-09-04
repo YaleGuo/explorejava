@@ -1,0 +1,74 @@
+Java Essay Serials 1 - Java Basics - 26, finally
+finally block is an optional block for Java exception processing, which would be executed before the program returned from try-catch block.
+
+The general structure is:
+try {
+    ...
+}
+catch (Exception e) {
+    ...
+}
+finally {
+    ...
+}
+A 'try' block must be followed with a 'catch' block or a 'finally' block or both, at least one.
+
+The program firstly execute the 'try' block, if no exception, the 'finally' block would be executed before the 'try' block returning or throwing exception, and if exceptions occurred, the 'catch' block would be executed before the 'catch' block returning or throwing exception. In other words, a 'finally' block would be certainly executed before returning. And because of that, we usually put some 'disposal' code in finally block, such as close connection or stream.
+
+Though usual situation is simple, sometimes things would be complex.
+for example:
+public class TryCatchTest {
+    public int test(){
+        int divider=10;
+        int result=100;
+        try{
+            while(divider>-1){
+                divider--;
+                result=result+100/divider;
+            }
+            return result;
+        }catch(Exception e){
+            e.printStackTrace();
+            return result=999;
+        }finally{
+            ++result;
+            System.out.println("finally block outputs result : "+result);
+            return result;
+        }   
+    }
+    public static void main(String[] args) {
+        TryCatchTest t=new TryCatchTest();
+        System.out.println("test() return : "+t.test());
+    }    
+}
+This program would outputs :
+java.lang.ArithmeticException: / by zero
+finally block outputs result : 1000
+test() return : 1000
+
+Now we analyse the output. The initial value of the variable 'result' is 100, within the 'try block', result divided by divider. When divider is set to 0, an exception would be occurred, hence the program would execute the 'catch' block. Firstly the program prints the exception stack trace:"java.lang.ArithmeticException: / by zero", then execute "return result=999". Here the program set the variable result to 999 and then returning, according to JLS, the 'finally' block would be executed before returning, so the program jumps into 'finally' block and execure "++result", thus the result is now 1000, again, the program meets the returning statement:"return result". Now, the program has two(2) returning statements, one is within "catch" block(result is 999) and the other is within the "finally" block(result is 1000), which one will be executed then? according to JLS, the returning statement in "finally" block would be executed. That's why the final result returned is 1000.
+
+If we modify the above program:
+        try{
+            while(divider>-1){
+                divider--;
+                result=result+100/divider;
+            }
+            return result;
+        }catch(Exception e){
+            e.printStackTrace();
+            return result=999;
+        }finally{
+            ++result;
+            System.out.println("finally block outputs result : "+result);
+            //return result;
+        }   
+Just to comment the returning statement in "finally" statement.
+The outputs would be:
+java.lang.ArithmeticException: / by zero
+finally block outputs result : 1000
+test() return : 999
+
+Some quizzled by the final result. They thought the variable "result" had incremented to 1000 in the "finally" block, the final result should be 1000. 
+Yes, the increment statement is executed, within the "finally" block the result is set to 1000. But, the "finally" block is executed before the returning statement in "catch" block, 
+which is "return result=999", the program first execute "result=999", now the returning result is 999, here Java store the returning result in the stack, then jump to "finally" block. After finishing "finally" block, the program jumped back to the "catch" block, to get the returning result from stack(is now still 999) and return. We can see that the changed value of variable result(1000) in "finally" block is ignored, so the final return value is 999.

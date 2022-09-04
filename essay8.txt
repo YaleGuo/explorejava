@@ -1,0 +1,76 @@
+Java Essay Serials 1 - Java Basics - 8, Can switch be applied for byte?long?String?
+Answer: Switch statement work with byte and String, but can not work with long.
+
+The following paragraph is abstracted from Sun's Java tutorial:
+A switch works with the byte, short, char, and int primitive data types. It also works with enumerated types, the String class, and a few special classes that wrap certain primitive types: Character, Byte, Short, and Integer.
+
+for example:
+	int ivar = 3;
+	switch(ivar){
+    	case 3 :
+       		break; 
+    	case 2 :
+       		break; 
+    	default : 
+	}
+
+Another example:
+	String var = "JAN";
+	switch (var) {
+	case "JAN":
+		break;
+	case "FEB":
+		break;
+	default:				
+	}
+
+but if you change the var's data type to long, the compiler will complain an error:
+Cannot switch on a value of type long. Only convertible int values, strings or enum variables are permitted.
+
+Java compiler implements switch statement using int datatype, even for enum and string. A long type value can not be converted to an int, that is the reason why Java do not support long datatype for switch statement.
+
+Now we have a look at how string work with switch.
+For the following code snippet:
+	String var = "JAN";
+	switch (var) {
+	case "JAN":
+		break;
+	case "FEB":
+		break;
+	default:				
+	}
+We can compile the above program and use a decompiler tool to decompile the program, here is the result:
+    String var = "JAN";
+    String str1;
+    switch ((str1 = var).hashCode())
+    {
+    case 69475:
+      if (str1.equals("FEB")) return; break;
+    case 73207:
+      if (str1.equals("JAN"))
+        return;
+    }
+From the above code, we can see that Java compiler first use hashCode() to get the string's hash code (an int), then lookup the hashcode,
+and because two different strings might have the same hash code, so the compiler will give a further check to use equals().
+
+That is to say, the source code of switch(string) statement is converted to switch(int) statement internally.
+
+We can go further to check the situation for enum.
+Code example:
+	ColorEnum color = ColorEnum.RED;
+	switch (color) {
+	case RED:
+		break;
+	case BLACK:
+		break;
+	default:	
+	}
+After decompile,the code likes the following:
+    label753: ColorEnum color = ColorEnum.RED;
+    switch ($SWITCH_TABLE$ColorEnum()[color.ordinal()])
+    {
+    case 1:
+    case 2:
+    }
+Here we can see that the compiler uses enum.ordinal() to get an int value and then check the switch lookup table.
+Again, the source code of the switch(enum) statement is converted to switch(int) statement.

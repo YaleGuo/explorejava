@@ -1,0 +1,183 @@
+Java Essay Serials 1 - Java Basics - 16, By Value vs By Reference
+
+Java always pass parameter by value. This means Java copy the value of the variable
+and set the value to the parameter, when changing the parameter value, the original
+variable value would not be changed.
+
+We will use the following example to prove this point.
+Example 1:
+	public static void increment(int i) {
+		System.out.println("input parameter : " + i);
+		i++;
+		System.out.println("parameter chnged to : " + i);
+	}
+	public static void main(String[] args){
+		int v1 = 200;
+		System.out.println("original var : " + v1);
+		increment(v1);
+		System.out.println("original var : " + v1);
+	}
+It outputs:
+	original var : 200
+	input parameter : 200
+	parameter chnged to : 201
+	original var : 200	
+We can see that for the original variable the value is not changed.
+The reason is that when Java passes the varaible v1 through the method increment(int i), Java copy the value(200) to the parameter i, thus, during the increment, the operation only apply for the parameter i. The original variable v1 was never touched.
+
+We will now have a look at the change of memory with the program:
+At first Java allocates memory (0x00EA38FA) for the variable v1 and sets the value:
+       address    | value |
+---------------------------
+| v1 | 0x00EA38FA |  200  |
+---------------------------
+When calling the method increment(), Java allocates another memeory address(0x302C09E0) to the parameter i and sets the value of i to the value of v1(200):
+       address    | value |
+---------------------------
+| v1 | 0x00EA38FA |  200  |
+---------------------------
+  ... ...
+---------------------------
+| i  | 0x302C09E0 |  200  |
+---------------------------
+
+the operation ++ would change the value of i, diagramed as below:
+       address    | value |
+---------------------------
+| v1 | 0x00EA38FA |  200  |
+---------------------------
+  ... ...
+---------------------------
+| i  | 0x302C09E0 |  201  |
+---------------------------
+When the program exits the method increment(), the memory mapping is:
+       address    | value |
+---------------------------
+| v1 | 0x00EA38FA |  200  |
+---------------------------
+  ... ...
+See that the value of v1 is still 200.
+
+Now, another problem arises: What happens when you pass an object reference to a method?
+
+Here we have another example.
+Firstly we create a INT class containing only one int:
+    public class INT {
+	int i;
+	INT(int i) {
+		this.i = i;
+	}
+	void increment() {
+		i++;
+	}
+    }
+Now we change the program to:
+    public static void increment(INT I) {
+	System.out.println("input parameter : " + I + ", value : " + I.i);
+	I = new INT(201);
+	System.out.println("parameter changed to : " + I+ ", value : " + I.i);
+    }
+    public static void main(String[] args){
+	INT v1 = new INT(200);
+	System.out.println("original var : " + v1+ ", value : " + v1.i);
+	increment(v1);
+	System.out.println("original var : " + v1+ ", value : " + v1.i);
+    }
+Which outputs:
+original var : com.test.INT@15db9742, value : 200
+input parameter : com.test.INT@15db9742, value : 200
+parameter changed to : com.test.INT@6d06d69c, value : 201
+original var : com.test.INT@15db9742, value : 200
+
+Shouldn't the value be changed? No. Here is why:
+
+Java firstly creates an object v1 with the value 200, note that v1 is an object reference, which will be allocated a memory address, and the memory for the object instance would also be allocated, here is the memory mapping:
+       address    |     value    |
+----------------------------------
+| v1 | 0x003065D0 |  0x480012E0  |
+----------------------------------
+  ... ...
+----------------------------------
+| instance | 0x480012E0 |   200  |
+----------------------------------
+
+When calling increment(v1), Java allocates another memeory address(0x302C09E0) to the parameter I and sets the value of I to the value of v1(0x480012E0):
+       address    |     value    |
+----------------------------------
+| v1 | 0x003065D0 |  0x480012E0  |
+----------------------------------
+  ... ...
+----------------------------------
+| I  | 0x302C09E0 |  0x480012E0  |
+----------------------------------
+  ... ...
+----------------------------------
+| instance | 0x480012E0 |   200  |
+----------------------------------
+
+When executing this line within the body of the method increment(INT I):
+	I = new INT(201);
+Java creates a new INT object instance and assigns the address(0x52001230) to I,
+here is the memory mapping:
+       address    |     value    |
+----------------------------------
+| v1 | 0x003065D0 |  0x480012E0  |
+----------------------------------
+  ... ...
+----------------------------------
+| I  | 0x302C09E0 |  0x52001230  |
+----------------------------------
+  ... ...
+----------------------------------
+| instance | 0x480012E0 |   200  |
+----------------------------------
+  ... ...
+----------------------------------
+| instance2| 0x52001230 |   201  |
+----------------------------------
+Now, in the memory, there are 2 object references and 2 object instances.
+
+After exiting the method increment(INT I), the memory would be collected:
+       address    |     value    |
+----------------------------------
+| v1 | 0x003065D0 |  0x480012E0  |
+----------------------------------
+  ... ...
+----------------------------------
+| instance | 0x480012E0 |   200  |
+----------------------------------
+That's why v1 is still refers to the instance with the value of 200.
+
+Though the value of the object reference parameter is not changed, the content of the object/instancerefered can be changed.
+
+For example:
+    public static void increment(INT I) {
+	System.out.println("input parameter : " + I + ", value : " + I.i);
+	I.increment();
+	System.out.println("parameter changed to : " + I+ ", value : " + I.i);
+    }
+    public static void main(String[] args){
+	INT v1 = new INT(200);
+	System.out.println("original var : " + v1+ ", value : " + v1.i);
+	increment(v1);
+	System.out.println("original var : " + v1+ ", value : " + v1.i);
+    }
+The result is :
+original var : com.test.INT@15db9742, value : 200
+input parameter : com.test.INT@15db9742, value : 200
+parameter changed to : com.test.INT@15db9742, value : 201
+original var : com.test.INT@15db9742, value : 201
+
+This is because the variable v1 and the parameter both refer to the same object.	The statement I.increment() changes the content of the refered instance. Shown below:
+       address    |     value    |
+----------------------------------
+| v1 | 0x003065D0 |  0x480012E0  |
+----------------------------------
+  ... ...
+----------------------------------
+| I  | 0x302C09E0 |  0x480012E0  |
+----------------------------------
+  ... ...
+----------------------------------
+| instance | 0x480012E0 |   201  |
+----------------------------------

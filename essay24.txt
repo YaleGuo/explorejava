@@ -1,0 +1,14 @@
+Java Essay Serials 1 - Java Basics - 24, Can an abstract method be static? native?synchronized?
+
+An abstract method can not be static, native or synchronized.
+
+The keyword 'static' means the method can be directly invoked even without an instance, but the keyword 'abstract' means this method must be oerridden for other methods to call it. The sementics is opposite. That's why 'static' is not compatible with 'abstract'.
+
+If we try to put them together, for example: public abstract static void demo();
+Then an error would be prompted:
+The abstract method demo in type TestClass can only set a visibility modifier, one of public or protected.
+
+It shows that abstract can only work together with visibility modifier. If we try to put native and abstract together, we would encounter the same error. Because the keyword 'native' hints the method can be called, only it's implemented with other language. The semantics is also opposite to abstract.
+
+The keyword 'synchronized' prevent the method from entering simultaneously for two or more threads. As the prerequisition of 'entering a method' is that the method can be called, so it's conflict with the semantics of abstract.
+

@@ -1,0 +1,106 @@
+Java Essay Serials 1 - Java Basics - 2. is String a primitive data type?
+
+The answer is no. 
+In Java there are eight primitive types: byte, short,int, long, float, double, char, and boolean. 
+Others are reference type,in another words, they are all objects.
+In fact, there is a real class named Object in Java. And the class Object is the root of the class hierarchy, this means Object is the universal parent class of all the classes in java by default, even you do not declare it explicitly.
+
+Let us take a look at the definition of String class in JDK:
+----------------------------------------------------------------------
+package java.lang;
+/**
+ * The {@code String} class represents character strings. All
+ * string literals in Java programs, such as {@code "abc"}, are
+ * implemented as instances of this class.
+ * 
+ * Strings are constant; their values cannot be changed after they
+ * are created. String buffers support mutable strings.
+ */
+public final class String
+    implements java.io.Serializable, Comparable<String>, CharSequence {
+}
+----------------------------------------------------------------------
+The class String includes methods for examining individual characters of 
+the sequence, for comparing strings, for searching strings, for extracting 
+substrings, and for creating a copy of a string with all characters translated 
+to uppercase or to lowercase. 
+
+Please keep in mind that String class is final, this means you cannot inherit it.
+This design is for safety consideration.
+
+The internal data structure in String class is an array of characters, defined as below:
+---------------------------------------------------
+/** The value is used for character storage. */
+    private final char value[];
+---------------------------------------------------
+note: Since Java 11, the internal storage structure has been changed to byte[] for performance reason.
+
+We know, the Object class contains several basic methods, such as equals().
+When checking the source code in Object class, we will find that the equals() method is implemented like this:
+----------------------------------------------
+    public boolean equals(Object obj) {
+        return (this == obj);
+    }
+----------------------------------------------
+equals() and == are the same! This means basically it will be false when applying euqals() on two objects,
+this method returns true if and only if they refer to the same object.
+That's why we must oerride equals() method when we define a new class, here is how String class override equals() method:
+------------------------------------------------------------
+public boolean equals(Object anObject) {
+        if (this == anObject) {
+            return true;
+        }
+        if (anObject instanceof String) {
+            String anotherString = (String)anObject;
+            int n = value.length;
+            if (n == anotherString.value.length) {
+                char v1[] = value;
+                char v2[] = anotherString.value;
+                int i = 0;
+                while (n-- != 0) {
+                    if (v1[i] != v2[i])
+                        return false;
+                    i++;
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+----------------------------------------------------------
+From the above code snippet, we can see String class overrides Object.equals()
+method by comparing each character in the value[]. That will get the expected result.
+
+Note that it is generally necessary to override the hashCode() method whenever equals() 
+method is overridden, so as to maintain the general contract for the hashCode() method, 
+which states that equal objects must have equal hash codes.
+Here is the hashCode() source code in String class:
+---------------------------------------------------
+    public int hashCode() {
+        int h = hash;
+        if (h == 0 && value.length > 0) {
+            char val[] = value;
+
+            for (int i = 0; i < value.length; i++) {
+                h = 31 * h + val[i];
+            }
+            hash = h;
+        }
+        return h;
+    }
+---------------------------------------------------
+
+Finally, strings are constant, their values cannot be changed after they are created.
+So we can just assign one string to another for copying it. If the original string value 
+will change, it will not change the value of new String because of immutability.
+See the below example:
+--------------------------------------------------------------
+public class TestString {
+	public static void main(String args[]) {
+		String str = "abc";
+		String newstr = str;
+		str = "def";
+		System.out.println(newstr); // prints "abc"
+	}
+}
+--------------------------------------------------------------

@@ -1,0 +1,47 @@
+Java Essay Serials 1 - Java Basics - 3, float f=3.14; is it correct?
+The answer is incorrect. 
+If you write the above code in IDE, the compiler would prompt "Type mismatch: cannot convert from double to float", that is because, by default, the literal 3.14 would be considered as a double type.
+To fix the above issue, 3.14 must be explicitly casted to a float:
+float f = (float) 3.14;
+A simple way is to declare 3.14 as a float value as below:
+float f = 3.14F; 
+float f = 3.14f;
+Personally I prefer the captalized style. (if you use lower case, the character l and the number 1(one) looks like the same.)
+Another way is to change the data type of f to double.
+
+Let us go a step further.
+From Wikipedia, the IEEE Standard for Floating-Point Arithmetic (IEEE 754) is a technical standard for floating-point arithmetic established in 1985 by the Institute of Electrical and Electronics Engineers (IEEE).
+All floating-point values in a computer are represented with 3 parts:sign, exponent and fraction.
+for example, for the decimal 78.375, the binary representation is 1001110.011, which is 1.001110011*2(6) with scientific notation. here, sign is 0(positive), exponent is 6, and fraction is 001110011(please note that the first digit 1 in 1.001110011 is ignored because the first digit is always 1).
+
+for single precision float and double precision double, the storage formats are proposed as follows: 
+float is represented in 32 bits, with 1 sign bit, 8 bits of exponent, and 23 bits of the significand.
+double is represented in 64 bits, with 1 sign bit, 11 bits of exponent, and 52 bits of significand.
+Then in Java, is accompliance with the IEEE standard,the value range is 3.40282347 x 10(38) to 1.40239846 x 10(-45) for a float, and 1.7976931348623157 x 10(308), 4.9406564584124654 x 10(-324) for a double.
+In general, I strongly encourage you use double type.
+
+As an extension on this topic, here I list the Range of numeric data types in Java:
+byte	8b	-128 .. 127
+short	16b	-32,768 .. 32,767
+int	32b	-2,147,483,648 .. 2,147,483,647
+long	64b	-9,223,372,036,854,775,808 .. 9,223,372,036,854,775,807
+float	32b	3.40282347 x 10(38), 1.40239846 x 10(-45)
+double	64b	1.7976931348623157 x 10(308), 4.9406564584124654 x 10(-324)
+
+You can convert a number from one type to others, but keep in mind there is a the potential risk: those conversions that may lose data (called narrowing).
+As a good programming practice, there is very little reason to perform any of these conversions. Usually all calculations are done in the appropriate data type: int, long, float, or double.
+That why for the statement float f=3.14, I suggest you fix the issue by changing the f's data type to double.
+
+And if you require accuracy, for example you are doing any program with currency, then use a BigDecimal, which is an arbitrary-precision signed decimal number. Sun/Oracle claims that the BigDecimal class provides operations for arithmetic, scale manipulation, rounding, comparison, hashing, and format conversion. It can handle very large and very small floating point numbers with great precision but compensating with the time complexity a bit.
+Here is an example:
+Input : double a=0.03;
+        double b=0.04;
+        double c=b-a;
+        System.out.println(c);
+Output :0.009999999999999998
+
+Input : BigDecimal _a = new BigDecimal("0.03");
+        BigDecimal _b = new BigDecimal("0.04");
+        BigDecimal _c = _b.subtract(_a);
+        System.out.println(_c);
+Output :0.01

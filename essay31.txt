@@ -1,0 +1,116 @@
+Java Essay Serials 1 - Java Basics - 31. How to clone an object
+The method clone() is used to clone an object.
+
+The Object class (which is the universal parent class in Java) offers a clone() method.
+The definition of the method clone() is:
+    protected native Object clone() throws CloneNotSupportedException;
+According to the API document, the method clone() creates and returns a copy of this object.But the precise meaning of "copy" may depend on the class of the object. The class Object does not implement clone(), the subclasses can override clone() and make an implementation.
+For example:
+    class Student{
+        public static void main(String[] args) throws CloneNotSupportedException{
+	    Student s = new Student();
+	    s.clone();
+        }
+    }
+The program just defines an empty class, it would inherit methods from the parent class - Object. So we can invoke s.clone() to try to make a copy of student instance, but because we have not implemented the method clone(), and nor the Object class, the invocation would throw a CloneNotSupportedException.
+Now we try to implement the method clone():
+    class Student{
+        public static void main(String[] args) throws CloneNotSupportedException{
+	    Student s = new Student();
+	    s.clone();
+        }
+        public Object clone() throws CloneNotSupportedException{
+    	    return null;
+        }
+    }
+Now the program can run without exception occurred, though we did not do anything at this moment.
+
+As a class may or may not implement the method clone(), so Java provides a tag interface to indicate this - Cloneable.A class implements the Cloneable interface to indicate to the Object.clone() method that it is legal for that method to make a field-for-field copy of instances of that class.
+Invoking Object's clone method on an instance that does not implement the Cloneable interface results in the exception CloneNotSupportedException being thrown.
+
+By convention, classes that implement this interface should override Object.clone (which is protected) with a public method. 
+For example:
+public class AClass implements Cloneable{
+    int score;
+    
+    public Object clone() throws CloneNotSupportedException{
+    	AClass ac = new AClass();
+    	ac.score = this.score;
+    	return ac;
+    }
+    public static void main(String[] args) throws CloneNotSupportedException {
+	AClass ac = new AClass();
+	ac.clone();
+    }
+}
+The method clone() would make a new instance of AClass and set the field score to the original object's value. Thus we created a duplicated instance. And because the clone object is a new instance, so a != a.clone().
+
+With the above program, we used a primitive type, what if the field is reference object? For example:
+public class AClass implements Cloneable{
+    int score;
+    Date birthday;
+    
+    public Object clone() throws CloneNotSupportedException{
+    	AClass ac = new AClass();
+    	ac.score = this.score;
+    	ac.birthday = this.birthday;
+    	return ac;
+    }
+}
+It seems like that it would create a copy of the original one. But as the field birthday is a reference, the assignment statement ac.birthday = this.birthday just
+have the field link to the original birthday object. We can test it with the following code:
+public class AClass implements Cloneable{
+	public static void main(String[] args) throws CloneNotSupportedException {
+		AClass ac = new AClass(87, new Date());
+		System.out.println("ac -"+ac);
+		
+		AClass ac2 = ac.clone();
+		System.out.println("ac2 -"+ac2);
+		ac2.score = 60;
+		ac2.birthday.setYear(100);
+		System.out.println("ac2 -"+ac2);
+
+		System.out.println("ac -"+ac);
+	}
+}
+The program prints:
+ac -{score:87,birthday:Tue Feb 09 13:32:02 AEDT 2021}
+ac2 -{score:87,birthday:Tue Feb 09 13:32:02 AEDT 2021}
+ac2 -{score:60,birthday:Wed Feb 09 13:32:02 AEDT 2000}
+ac -{score:87,birthday:Wed Feb 09 13:32:02 AEDT 2000}
+
+From the output, we can see that ac2 is a copy of the original ac. But if we change the fields values of ac2, the field birthday of the original ac is also changed!
+That's because the field birthday is a referene, we have not create a new reference object to this field.
+We call this shallow copy.
+If we want to clone a fully separate object, we need to implement deep copy.
+Here is the code:
+public class AClass implements Cloneable{
+    int score;
+    Date birthday;
+
+    public AClass(){}
+    
+    public AClass(int score, Date birthday) {
+    	this.score = score;
+    	this.birthday = birthday;
+    }
+    
+    public String toString(){
+    	return "{score:"+score+","+"birthday:"+birthday+"}";
+    }
+    
+    @Override
+    public AClass clone() throws CloneNotSupportedException{
+    	AClass ac = new AClass();
+    	ac.score = this.score;
+    	ac.birthday = Date.from(this.birthday.toInstant());
+    	return ac;
+    }
+}
+We use Date.from(this.birthday.toInstant()) to make a new date object.
+Run the test program again, it outputs:
+ac -{score:87,birthday:Tue Feb 09 13:41:39 AEDT 2021}
+ac2 -{score:87,birthday:Tue Feb 09 13:41:39 AEDT 2021}
+ac2 -{score:60,birthday:Wed Feb 09 13:41:39 AEDT 2000}
+ac -{score:87,birthday:Tue Feb 09 13:41:39 AEDT 2021}
+This time, the change to the clone object did not affect the original one.

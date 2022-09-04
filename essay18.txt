@@ -1,0 +1,56 @@
+Java Essay Serials 1 - Java Basics - 18, Can a char type variable store a chinese character?
+Basically the answer is YES, a char type variable can store a chinese character.
+The reason is that Java supports Unicode, so multibyte-character such as chinese character is not a problem. 
+
+But we have to know, Unicode contains 17 planes, usually we use the plane 0, which the code range from u0000-uFFFF. We call this BMP (Basic Multilingual Plane). Theoreotically plane 0 can contain 65536 characters, but the actual amount is less than 65536 as the code range uD800-uDFFF is reserved for extension purposes. That means BMP can not represent all characters, for example,some ancient chinese charaters is out of this range.
+
+Java adopts UTF-16 to store Unicode characters. Accroding to the standard ISO/IEC 10646-1, UTF-16 uses 2 bytes to store a BMP Unicode character, and for those characters which code are defined in the range u10000-u10FFFF, UTF-16 uses 4 bytes to store.
+
+In Java, the length of a char type variable is 2 bytes, so a char type variable can store a UTF-16 encoded BMP character. As most of chinese characters are defined in the range from 0x4E00 to 0x9FBB, so Java works with chinese well. 
+for example:
+	char c1 = 'A';
+	char c2 = 0x41;
+	char c3 = '\u0041';
+	char c4 = '郭';
+	char c5 = '\u90ED';
+	System.out.println(c1);
+	System.out.println(c2);
+	System.out.println(c3);
+	System.out.println(c4);
+	System.out.println(c5);
+This program outputs:
+A
+A
+A
+郭
+郭
+We can see that chinese character works properly.
+
+We now use another example to print the internal representation of a String:
+	String s = "Author 郭";
+	byte[] bytes = s.getBytes("UTF-16");
+	for (int i = 0; i < bytes.length; i++) { 
+		System.out.format("%02X ",bytes[i]);
+        }  
+The result would be:
+FE FF 00 41 00 75 00 74 00 68 00 6F 00 72 00 20 90 ED
+The last 2 bytes - 90 ED - is the UTF-16 code for chinese character '郭'.
+
+For those extension characters in other planes, prior to JDK1.5, Java does not support, now Java uses 2 characters to represent them (refer to JSP 204).
+for example:
+	String s = "Hanzi 𠀡";
+	byte[] bytes = s.getBytes("UTF-16");
+	for (int i = 0; i < bytes.length; i++) { 
+		System.out.format("%02X ",bytes[i]);
+        }  
+The result would be:
+FE FF 00 48 00 61 00 6E 00 7A 00 69 00 20 D8 40 DC 21
+The last 4 bytes - D8 40 DC 21 - is the UTF-16 code for the chinese character '𠀡'.
+This chinese character can not be stored with a Java char. If we write the code like this:
+char c= '𠀡';
+or
+char c='\u20021';
+The Java compiler would prompt an error:Invalid character constant.
+
+A program usually processes BMP characters, so we can simply say that a char type variable stores a chinese character.
+

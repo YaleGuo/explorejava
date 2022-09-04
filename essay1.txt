@@ -1,0 +1,42 @@
+Java Essay Serials 1 - Java Basics - 1, public, private and protected
+
+Basically we can understand the meaning according to the names.
+1, public : A public field can be accessed by any other classes, even they are contained in other packages.
+2, private : A private field won’t be visible to other classes, it can be only used by the class itself(inner class is an exception).Even a subclass cannot access the private fields of its superclass.
+3, default : by default, the field can be accessed by other classes within the same package.
+4, protected : A simple way to understand "protected" is that it can be accessed by subclass, which
+is not wrong, but is not accurately correct. The fact is that the protected field can only be accessed
+within the subclass object with a reference and can not be accessed directly.
+
+In <<Core Java>>, the author give an example:
+------------------------------------------------------------------------
+For example, if the superclass Employee declares the hireDay field as protected, 
+then the subclass Manager methods can access it directly. However, the Manager 
+class methods can peek inside the hireDay field of Manager objects only, not of 
+other Employee objects. 
+-------------------------------------------------------------------------
+Here I give a sample code. First we define a superclass TestBody within com.demo package:
+package com.demo;
+public class TestBody{
+    protected int field1 = 10;
+}
+Then we define the subclass TestBody2 within a different package com.test:
+package com.test;
+import com.demo.TestBody;
+public class TestBody2 extends TestBody {
+    public void test() {
+        TestBody body = new TestBody();
+        //body.field1 is not available
+        //this.field1 is available
+    }
+}
+
+In the book <<Java Programming Language>>, James Gosling gives an explanation why apply the restriction,
+he describes such a situation: one subclass extends one superclass and makes some modifications to the superclass' protected fields directly, then another subclass comes, which can also modify the superclass'
+proteced field directly but with a diffrent way, this will conflict with the first subclass.
+
+In practice, use protected fields with caution. Suppose your class is used by other
+programmers. Unknown to you, other programmers may inherit classes from your class 
+and start accessing your protected fields. In this case, you can no longer change 
+the implementation of your class without upsetting the other programmers. 
+That is against the spirit of OOP, which encourages data encapsulation.

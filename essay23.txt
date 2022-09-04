@@ -1,0 +1,61 @@
+Java Essay Serials 1 - Java Basics - 23, What is final?
+
+final is a keyword in Java, which means constant and cannot be changed. This keyword can be applied to class, method and variable. Let us analyse the situations respectively.
+
+final method:
+When the keyword final is applied to a method, then the method can not be overridden. If we try to override a final method, the compiler would prompt an error: Cannot override the final method from ParentClass.
+
+final class:
+When the keyword final is applied to a class, then the class cannot be inherited.
+If we try to extend a final class, the compiler would prompt an error: The type SubClass cannot subclass the final class ParentClass.
+
+final variable:
+A final varaible cannot be re-assigned a value. If we try to re-assign a final variable, the compiler would prompt an error: 
+The final field TestClass.s cannot be assigned.
+
+A final instance variable(field) can only be initialized in constructor or when it's declared, for example:
+	final String s = "test";
+or
+	final String s;	
+	public TestClass(){
+	    s= "test";
+	}
+If we leave it to blank, the compiler would prompt an error:
+The blank final field s may not have been initialized.
+
+Because Java ensures a final field initialized before the enclosing object returned, so the final keyword is very useful in multi-thread programming. We get a guarantee for the variable be visible among threads with final keyword.
+
+Let us have a look at the situation of local variable:
+	void test(){
+		final String s;
+		s="a";
+		s="b";
+	}
+The compiler would complain: The final local variable s may already have been assigned.
+
+Another example:
+		int[] ar = new int[]{1,2,3};
+		for (final int i=0;i<ar.length;i++) {
+		}
+This program does not work. Here is the error message:
+
+The final local variable i cannot be assigned. It must be blank and not using a compound assignment.
+
+But we can use final keyword in foreach statement:
+		int[] ar = new int[]{1,2,3};		
+		for (final int i : ar){
+			System.out.println(ar);
+		}
+This program now works properly, because the 'foreach' statment re-declared the variable when iterating the array.
+
+A final value is often used as a constant. In Java, there is no constant keyword, instead, we use 'static final' to represent a constant. For a static final variable, it can only be initialized at the time of declaration.
+
+If a final variable is reference, though we cannot change its value, but we can change the value of the object it refers. for example:
+	final char[] arr= new char[]{'a','b','c'};
+	void test(){
+		arr[2] = 'd';
+		System.out.println(arr);
+	}
+We can see that the variable arr is not changed, but the content of the arr is changed.
+
+Finally, for an interface or an anonymous class, all the variables are automatically set to final.

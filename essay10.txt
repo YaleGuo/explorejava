@@ -1,0 +1,74 @@
+Java Essay Serials 1 - Java Basics - 10, the features of Constructor
+
+A constructor is a code block that is used to initialize objects. The constructor is invoked when Java instantiate a class. You can regard constructor as a special method.
+
+When declaring a variable, we write:
+type name;
+if the type is a primitive type, this declaration also reserves the proper amount of memory for the variable;
+And if the type is a reference, means a class, the value would be underdetermined at this stage, in other words, currently references no object.
+You can create an object with new statement, that is the most basic way.
+for example, you write:
+Student objStudent = new Student();
+With the above statement, Java would execute three steps, Loading, Instantiating and Initializing.
+Loading loads the class in JVM and thus get a memory mapping of the class;
+Instantiating would create a new object based on the blueprint(class);
+Initializing would initialize the new object's attributes, that is the duty of constructor.
+
+Actually you can write the steps as 2 seperate processes.
+---------------------------------------
+Class clz = Class.forName("Student");
+clz.newInstance();
+---------------------------------------
+Class.forName() would load the class into JVM.
+newInstance() would instantiate and initialize the created object(via call constructor).
+
+A similar method is to use reflection to create a new instance. Internally,
+Java use reflection to implement Class.forName().
+
+Will all creating processes invoke constructor? the answer is no.
+for clone(), for deseialization, they do not invoke any constructors.
+
+All classes have constructors by default: if you do not create a class constructor yourself, Java creates one for you. Java compiler inserts a default constructor into your code on your behalf. 
+
+You can use this() to call other constructors within the same class or use super() to call parent class' constructor. Please note that this() and super() should be the first statement in the constructor code. We ususally call this constructor chain.
+But constructors can not be inherited, in other words, they can not be overrided.
+
+Even for an abstract class, it can have constructor and it gets invoked when a concrete class is instantiated. for example:
+---------------------------------------------
+public class TestObject extends AbstractObject{
+	void test() {
+		System.out.println("Test");
+	}
+	public static void main(String[] args) {
+		new TestObject().test();
+	}
+}
+abstract class AbstractObject {
+	AbstractObject() {
+		System.out.println("call abstract constructor");
+	}
+	abstract void test();
+}
+-----------------------------------------------
+The program outputs :
+call abstract constructor
+Test
+
+The constructor is designed to create instance for other programs, but sometimes, for special reason, we do not want other programs to create the class' instance. For this purpose, you can write a private constructor:
+----------------------------------------
+public class Singleton {
+    private Singleton(){}
+}
+----------------------------------------
+This will prevent it from being created by other programs. No other one can instantiate the class Singleton. But how to get the instance then?
+We can give a static instance and provide a public get() to others:
+--------------------------------------------------------
+public class Singleton {
+    private static Singleton instance = new Singleton();   
+    private Singleton(){}
+    public static Singleton getInstance(){
+        return instance;
+    }
+}
+--------------------------------------------------------
+This is a simple but famous design pattern - Singleton.
